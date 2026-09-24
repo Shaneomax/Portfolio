@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-primary: #ff2d55;
+  --brand-cyan: #00f0ff;
+  --brand-amber: #ffb800;
+  --surface-950: #030306;
+  --surface-900: #08090d;
+  --surface-850: #0d0f15;
+  --surface-800: #13151f;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050609;
+  border-left: 1px solid rgba(255, 45, 85, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f2333;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 45, 85, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff2d55;
+  box-shadow: 0 0 10px #ff2d55;
+}
+
+/* Cyber Chamfer Cuts */
+.cyber-chamfer {
+  clip-path: polygon(
+    0 12px,
+    12px 0,
+    100% 0,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    0 100%
+  );
+}
+
+.cyber-chamfer-lg {
+  clip-path: polygon(
+    0 20px,
+    20px 0,
+    100% 0,
+    100% calc(100% - 20px),
+    calc(100% - 20px) 100%,
+    0 100%
+  );
+}
+
+.cyber-bracket {
+  position: relative;
+}
+
+.cyber-bracket::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid var(--brand-primary);
+  border-left: 2px solid var(--brand-primary);
+  pointer-events: none;
+}
+
+.cyber-bracket::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid var(--brand-primary);
+  border-right: 2px solid var(--brand-primary);
+  pointer-events: none;
+}
+
+/* Grid & Scanline Backgrounds */
+.cyber-grid-bg {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 45, 85, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 45, 85, 0.04) 1px, transparent 1px);
+}
+
+.cyber-dots-bg {
+  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(255, 45, 85, 0.15) 1px, transparent 1px);
+}
+
+.scanlines-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Glowing text effects */
+.glow-text-red {
+  text-shadow: 0 0 10px rgba(255, 45, 85, 0.6), 0 0 25px rgba(255, 45, 85, 0.3);
+}
+
+.glow-text-cyan {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.6), 0 0 25px rgba(0, 240, 255, 0.3);
+}
+
+/* Glitch typography */
+.glitch-title {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-title::before,
+.glitch-title::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  clip: rect(0, 0, 0, 0);
+}
+
+.glitch-title:hover::before {
+  left: 2px;
+  text-shadow: -2px 0 #00f0ff;
+  animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+
+.glitch-title:hover::after {
+  left: -2px;
+  text-shadow: 2px 0 #ff2d55;
+  animation: glitch-anim-2 2.5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+  0% { clip: rect(10px, 9999px, 30px, 0); }
+  25% { clip: rect(60px, 9999px, 80px, 0); }
+  50% { clip: rect(20px, 9999px, 40px, 0); }
+  75% { clip: rect(70px, 9999px, 90px, 0); }
+  100% { clip: rect(5px, 9999px, 25px, 0); }
+}
+
+@keyframes glitch-anim-2 {
+  0% { clip: rect(40px, 9999px, 60px, 0); }
+  25% { clip: rect(15px, 9999px, 35px, 0); }
+  50% { clip: rect(75px, 9999px, 95px, 0); }
+  75% { clip: rect(30px, 9999px, 50px, 0); }
+  100% { clip: rect(50px, 9999px, 70px, 0); }
+}
+
+/* Glassmorphism card */
+.glass-panel {
+  background: rgba(13, 15, 21, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 45, 85, 0.12);
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 45, 85, 0.35);
+}
+
+/* Animated laser border */
+@keyframes border-glow {
+  0%, 100% { border-color: rgba(255, 45, 85, 0.2); }
+  50% { border-color: rgba(255, 45, 85, 0.7); box-shadow: 0 0 15px rgba(255, 45, 85, 0.25); }
+}
+
+.laser-pulse {
+  animation: border-glow 3s infinite ease-in-out;
+}
