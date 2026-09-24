@@ -331,7 +331,7 @@ export default function ContactSection({ prefilledService }) {
                 </a>
 
                 <a
-                  href="https://drive.google.com"
+                  href={personalData.resumeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={playClick}

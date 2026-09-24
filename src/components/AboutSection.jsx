@@ -59,7 +59,7 @@ export default function AboutSection() {
 
             <div className="flex flex-wrap items-center gap-4 pt-4">
               <a
-                href="https://drive.google.com"
+                href={personalData.resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={playClick}

@@ -6,13 +6,13 @@ export const personalData = {
   heroDescription: "Passionate Unity Game Developer with 1.5+ years of experience crafting responsive 2D and 3D games, combat mechanics, playable WebGL games on Itch.io, and interactive simulation systems.",
   location: "Dhaka, Bangladesh",
   coordinates: "23.8103° N, 90.4125° E",
-  email: "anikpal.dev@gmail.com",
-  secondaryEmail: "anikpal.dev@gmail.com",
+  email: "anikpal475@gmail.com",
+  secondaryEmail: "anikpal475@gmail.com",
   github: "https://github.com/Shaneomax",
   itchio: "https://anik-pal.itch.io/",
   linkedin: "https://linkedin.com",
   medium: "https://medium.com/brainstation23/my-experience-with-building-messenger-in-unity-8d70d9d40922",
-  resumeUrl: "#resume",
+  resumeUrl: "https://drive.google.com/drive/folders/1Z05YPUmnB0-88iV3Eu6As7eSMR3tGIWJ?usp=sharing",
   bioHeadline: "Developing responsive 2D & 3D gameplay loops, combat mechanics, and optimized game experiences in Unity.",
   bioParagraph1: "As a Unity Game Developer with 1.5+ years of hands-on experience, I build engaging 2D and 3D games across PC, WebGL (Itch.io), and mobile. I focus on core gameplay programming, state machines, Mixamo animations, 2D sprite sheets, Mecanim blend trees, physics, and responsive controls.",
   bioParagraph2: "Having completed my B.Sc in Computer Science and Engineering from North South University (NSU), I have shipped 8+ games on Itch.io and maintain 12+ open repositories on GitHub.",
@@ -613,7 +613,7 @@ export const skillCategories = [
     skills: [
       { name: "Itch.io Game Publishing", level: "Advanced" },
       { name: "Git & GitHub (Shaneomax)", level: "Advanced" },
-      { name: "Blender (3D Asset Prep & Mixamo Integration)", level: "Intermediate" },
+      { name: "Unity Profiler & GC Tuning", level: "Advanced" },
       { name: "Visual Studio & VS Code", level: "Advanced" },
       { name: "Unity Package Manager & URP", level: "Advanced" },
       { name: "WebGL & Desktop Build Pipelines", level: "Advanced" }
@@ -623,5 +623,5 @@ export const skillCategories = [
 
 export const techMarquee = [
   "UNITY 6", "C#", "2D GAMEPLAY", "3D COMBAT", "URP",
-  "PHYSX", "MIXAMO & MECANIM", "BLENDER", "WEBGL", "ITCH.IO"
+  "PHYSX", "MIXAMO & MECANIM", "WEBGL", "ITCH.IO"
 ];

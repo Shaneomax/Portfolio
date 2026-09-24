@@ -171,7 +171,7 @@ export default function Navbar({ onOpenTerminal, soundState, setSoundState }) {
 
           {/* Resume CTA */}
           <a
-            href="https://drive.google.com"
+            href={personalData.resumeUrl}
             target="_blank"
             rel="noopener noreferrer"
             onMouseEnter={playHover}
@@ -239,7 +239,7 @@ export default function Navbar({ onOpenTerminal, soundState, setSoundState }) {
               <span>TERMINAL CLI</span>
             </button>
             <a
-              href="https://drive.google.com"
+              href={personalData.resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center space-x-2 text-xs text-white bg-brand-primary px-4 py-2 font-bold"
