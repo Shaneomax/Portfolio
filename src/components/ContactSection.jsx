@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Send, Mail, MapPin, Copy, Check, Radio, Terminal, ExternalLink, MessageSquare, AlertCircle } from 'lucide-react';
+import { Send, Mail, MapPin, Copy, Check, Radio, ExternalLink, Loader2 } from 'lucide-react';
 import { ItchIoIcon } from './BrandIcons';
-import { personalData, servicesData } from '../data/portfolioData';
+import { personalData } from '../data/portfolioData';
 import { playHover, playClick, playConfirm, playChirp } from '../utils/audio';
+
+// Formspree endpoint – replace YOUR_FORM_ID with the ID from formspree.io/new
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xvgajglq';
 
 export default function ContactSection({ prefilledService }) {
   const [formData, setFormData] = useState({
@@ -13,9 +16,8 @@ export default function ContactSection({ prefilledService }) {
   });
 
   const [copied, setCopied] = useState(false);
-  const [transmitting, setTransmitting] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [transmitted, setTransmitted] = useState(false);
+  const [status, setStatus] = useState('idle'); // idle | submitting | success | error
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     if (prefilledService) {
@@ -30,32 +32,52 @@ export default function ContactSection({ prefilledService }) {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
 
     playChirp();
-    setTransmitting(true);
-    setProgress(15);
+    setStatus('submitting');
+    setErrorMsg('');
 
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTransmitting(false);
-          setTransmitted(true);
-          playConfirm();
-          return 100;
-        }
-        return prev + 25;
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          service: formData.service,
+          message: formData.message,
+        }),
       });
-    }, 200);
+
+      if (response.ok) {
+        playConfirm();
+        setStatus('success');
+      } else {
+        const data = await response.json();
+        setErrorMsg(data?.errors?.[0]?.message || 'Transmission failed. Please try again.');
+        setStatus('error');
+      }
+    } catch (err) {
+      setErrorMsg('Network error. Please check your connection and try again.');
+      setStatus('error');
+    }
   };
 
   const handleReset = () => {
     playClick();
-    setTransmitted(false);
-    setProgress(0);
+    setStatus('idle');
+    setErrorMsg('');
     setFormData({
       name: '',
       email: '',
@@ -77,28 +99,28 @@ export default function ContactSection({ prefilledService }) {
             INITIATE CONTACT
           </h2>
           <p className="text-slate-400 font-sans text-sm sm:text-base max-w-2xl leading-relaxed">
-            Looking for an agile Unity game developer for 2D & 3D games, combat mechanics, simulation systems, or Itch.io WebGL deployment? Open a direct transmission channel below.
+            Looking for a Unity game developer for 2D & 3D games, combat mechanics, simulation systems, or Itch.io WebGL deployment? Send a message below — it goes straight to my inbox.
           </p>
         </div>
 
         {/* 2-Column Terminal Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Direct Comms Console Form (7 Cols) */}
+          {/* Contact Form (7 Cols) */}
           <div className="lg:col-span-7 bg-surface-900 border border-brand-primary/40 cyber-chamfer p-6 sm:p-8 space-y-6 shadow-cyber-card">
             {/* Terminal Window Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4 font-mono text-xs">
               <div className="flex items-center space-x-2">
                 <span className="w-2.5 h-2.5 bg-brand-primary rounded-full animate-ping" />
                 <span className="font-bold text-white tracking-wider">
-                  COMMS_STATION // PORT 9026
+                  DIRECT_MESSAGE // SEND TO ANIK
                 </span>
               </div>
               <span className="text-brand-cyan text-[10px] bg-brand-cyan/10 px-2 py-0.5 border border-brand-cyan/30">
-                SSL 256-BIT ENCRYPTED
+                REAL EMAIL DELIVERY
               </span>
             </div>
 
-            {transmitted ? (
+            {status === 'success' ? (
               /* Success State */
               <div className="py-12 text-center space-y-5 font-mono">
                 <div className="w-16 h-16 mx-auto rounded-full bg-brand-primary/20 border-2 border-brand-primary flex items-center justify-center shadow-[0_0_25px_#ff2d55]">
@@ -106,10 +128,10 @@ export default function ContactSection({ prefilledService }) {
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-display font-bold text-2xl text-white">
-                    TRANSMISSION DISPATCHED
+                    MESSAGE SENT!
                   </h3>
                   <p className="text-xs text-slate-400 max-w-md mx-auto">
-                    Packet successfully routed to operator <span className="text-brand-primary">Anik Pal</span>. Expect response via return frequency within 24 hours.
+                    Your message was delivered directly to <span className="text-brand-primary">anikpal475@gmail.com</span>. Expect a reply within 24 hours.
                   </p>
                 </div>
                 <div className="pt-4">
@@ -117,7 +139,7 @@ export default function ContactSection({ prefilledService }) {
                     onClick={handleReset}
                     className="px-6 py-2.5 bg-surface-950 hover:bg-surface-850 text-brand-cyan border border-brand-cyan/40 hover:border-brand-cyan text-xs font-bold tracking-wider cyber-chamfer transition-all"
                   >
-                    SEND ANOTHER TRANSMISSION
+                    SEND ANOTHER MESSAGE
                   </button>
                 </div>
               </div>
@@ -127,13 +149,14 @@ export default function ContactSection({ prefilledService }) {
                 {/* Name */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 block tracking-wider uppercase">
-                    // OPERATOR CALLSIGN (YOUR NAME) *
+                    // YOUR NAME *
                   </label>
                   <input
                     type="text"
+                    name="name"
                     required
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...prev => ({ ...prev, name: e.target.value }) })}
+                    onChange={handleChange}
                     placeholder="e.g. Recruiter / Game Studio Producer"
                     className="w-full bg-surface-950 border border-slate-700 focus:border-brand-primary px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-brand-primary cyber-chamfer transition-all"
                   />
@@ -142,13 +165,14 @@ export default function ContactSection({ prefilledService }) {
                 {/* Email */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 block tracking-wider uppercase">
-                    // RETURN FREQUENCY (YOUR EMAIL) *
+                    // YOUR EMAIL *
                   </label>
                   <input
                     type="email"
+                    name="email"
                     required
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...prev => ({ ...prev, email: e.target.value }) })}
+                    onChange={handleChange}
                     placeholder="e.g. contact@studio.com"
                     className="w-full bg-surface-950 border border-slate-700 focus:border-brand-primary px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-brand-primary cyber-chamfer transition-all"
                   />
@@ -157,11 +181,12 @@ export default function ContactSection({ prefilledService }) {
                 {/* Service Selection */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 block tracking-wider uppercase">
-                    // ENGAGEMENT VECTOR (SERVICE TYPE)
+                    // SUBJECT / SERVICE TYPE
                   </label>
                   <select
+                    name="service"
                     value={formData.service}
-                    onChange={(e) => setFormData({ ...prev => ({ ...prev, service: e.target.value }) })}
+                    onChange={handleChange}
                     className="w-full bg-surface-950 border border-slate-700 focus:border-brand-primary px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-brand-primary cyber-chamfer transition-all"
                   >
                     <option value="General Technical Inquiry">General Technical Inquiry</option>
@@ -177,54 +202,55 @@ export default function ContactSection({ prefilledService }) {
                 {/* Message */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 block tracking-wider uppercase">
-                    // TRANSMISSION PAYLOAD (BRIEF / MESSAGE) *
+                    // YOUR MESSAGE *
                   </label>
                   <textarea
+                    name="message"
                     required
                     rows={4}
                     value={formData.message}
-                    onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                    placeholder="Describe project requirements, platform targets (WebGL, PC, Mobile), timeline, and deliverables..."
+                    onChange={handleChange}
+                    placeholder="Describe your project, platform targets (WebGL, PC, Mobile), timeline, and any other details..."
                     className="w-full bg-surface-950 border border-slate-700 focus:border-brand-primary px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-brand-primary cyber-chamfer transition-all resize-none"
                   />
                 </div>
 
-                {/* Transmission Progress Simulation */}
-                {transmitting && (
-                  <div className="space-y-2 pt-2">
-                    <div className="flex justify-between text-[11px] text-brand-primary font-bold">
-                      <span>ROUTING DATA PACKETS...</span>
-                      <span>{progress}%</span>
-                    </div>
-                    <div className="w-full h-2 bg-surface-950 border border-slate-800 rounded-sm overflow-hidden">
-                      <div
-                        className="h-full bg-brand-primary transition-all duration-200"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
+                {/* Error Message */}
+                {status === 'error' && (
+                  <div className="p-3 bg-red-950/40 border border-red-700/60 text-red-400 text-xs font-mono">
+                    ⚠ {errorMsg}
                   </div>
                 )}
 
                 {/* Submit button */}
                 <button
                   type="submit"
-                  disabled={transmitting}
+                  disabled={status === 'submitting'}
                   onMouseEnter={playHover}
-                  className="w-full flex items-center justify-center space-x-2 py-3.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold tracking-wider cyber-chamfer shadow-[0_0_20px_rgba(255,45,85,0.4)] transition-all duration-200 disabled:opacity-50"
+                  className="w-full flex items-center justify-center space-x-2 py-3.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold tracking-wider cyber-chamfer shadow-[0_0_20px_rgba(255,45,85,0.4)] transition-all duration-200 disabled:opacity-60"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>TRANSMIT PACKET NOW</span>
+                  {status === 'submitting' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>SENDING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>SEND MESSAGE</span>
+                    </>
+                  )}
                 </button>
               </form>
             )}
           </div>
 
-          {/* Right Direct Coordinates & Channels (5 Cols) */}
+          {/* Right: Direct Contacts & Links (5 Cols) */}
           <div className="lg:col-span-5 space-y-6 font-mono text-xs">
             {/* Email Card with 1-Click Copy */}
             <div className="p-6 bg-surface-900 border border-slate-800 cyber-chamfer space-y-4">
               <span className="text-slate-400 tracking-wider uppercase block font-semibold">
-                // DIRECT COMMS FREQUENCY
+                // DIRECT EMAIL
               </span>
 
               <div className="p-3 bg-surface-950 border border-slate-800 flex items-center justify-between">
@@ -253,7 +279,7 @@ export default function ContactSection({ prefilledService }) {
             {/* Geographical Coordinates */}
             <div className="p-6 bg-surface-900 border border-slate-800 cyber-chamfer space-y-4">
               <span className="text-slate-400 tracking-wider uppercase block font-semibold">
-                // GEOGRAPHIC TELEMETRY
+                // LOCATION
               </span>
 
               <div className="space-y-2">
@@ -272,10 +298,10 @@ export default function ContactSection({ prefilledService }) {
               </div>
             </div>
 
-            {/* Signal Channels (GitHub, LinkedIn, Medium) */}
+            {/* External Links */}
             <div className="p-6 bg-surface-900 border border-slate-800 cyber-chamfer space-y-3">
               <span className="text-slate-400 tracking-wider uppercase block font-semibold">
-                // EXTERNAL SIGNAL CHANNELS
+                // FIND ME ONLINE
               </span>
 
               <div className="grid grid-cols-2 gap-2">
@@ -326,7 +352,7 @@ export default function ContactSection({ prefilledService }) {
                   onMouseEnter={playHover}
                   className="p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all"
                 >
-                  <span>RESUME PDF (CV)</span>
+                  <span>RESUME (CV)</span>
                   <ExternalLink className="w-3.5 h-3.5 text-brand-primary" />
                 </a>
               </div>

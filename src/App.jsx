@@ -8,7 +8,6 @@ import TitlesReel from './components/TitlesReel';
 import ProjectsSection from './components/ProjectsSection';
 import ProjectModal from './components/ProjectModal';
 import ServicesSection from './components/ServicesSection';
-import ProtocolSection from './components/ProtocolSection';
 import ExperienceSection from './components/ExperienceSection';
 import SkillsSection from './components/SkillsSection';
 import AboutSection from './components/AboutSection';
@@ -60,7 +59,6 @@ export default function App() {
         <TitlesReel onSelectProject={handleSelectProject} />
         <ProjectsSection onSelectProject={handleSelectProject} />
         <ServicesSection onSelectService={handleSelectService} />
-        <ProtocolSection />
         <ExperienceSection />
         <SkillsSection />
         <AboutSection />
