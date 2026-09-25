@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Send, Mail, MapPin, Copy, Check, Radio, ExternalLink, Loader2 } from 'lucide-react';
+import { Send, Mail, Copy, Check, Radio, ExternalLink } from 'lucide-react';
 import { ItchIoIcon } from './BrandIcons';
 import { personalData } from '../data/portfolioData';
 import { playHover, playClick, playConfirm, playChirp } from '../utils/audio';
-
-// Formspree endpoint – replace YOUR_FORM_ID with the ID from formspree.io/new
-const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xvgajglq';
 
 export default function ContactSection({ prefilledService }) {
   const [formData, setFormData] = useState({
@@ -16,8 +13,7 @@ export default function ContactSection({ prefilledService }) {
   });
 
   const [copied, setCopied] = useState(false);
-  const [status, setStatus] = useState('idle'); // idle | submitting | success | error
-  const [errorMsg, setErrorMsg] = useState('');
+  const [status, setStatus] = useState('idle'); // idle | success
 
   useEffect(() => {
     if (prefilledService) {
@@ -37,47 +33,31 @@ export default function ContactSection({ prefilledService }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
 
     playChirp();
-    setStatus('submitting');
-    setErrorMsg('');
 
-    try {
-      const response = await fetch(FORMSPREE_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          service: formData.service,
-          message: formData.message,
-        }),
-      });
+    const subject = encodeURIComponent(`[Portfolio] ${formData.service} — from ${formData.name}`);
+    const body = encodeURIComponent(
+      `Name: ${formData.name}\nEmail: ${formData.email}\nService: ${formData.service}\n\nMessage:\n${formData.message}`
+    );
+    const mailtoLink = `mailto:${personalData.email}?subject=${subject}&body=${body}`;
 
-      if (response.ok) {
-        playConfirm();
-        setStatus('success');
-      } else {
-        const data = await response.json();
-        setErrorMsg(data?.errors?.[0]?.message || 'Transmission failed. Please try again.');
-        setStatus('error');
-      }
-    } catch (err) {
-      setErrorMsg('Network error. Please check your connection and try again.');
-      setStatus('error');
-    }
+    // Open email client
+    window.location.href = mailtoLink;
+
+    // Show success after short delay
+    setTimeout(() => {
+      playConfirm();
+      setStatus('success');
+    }, 500);
   };
 
   const handleReset = () => {
     playClick();
     setStatus('idle');
-    setErrorMsg('');
     setFormData({
       name: '',
       email: '',
@@ -215,31 +195,14 @@ export default function ContactSection({ prefilledService }) {
                   />
                 </div>
 
-                {/* Error Message */}
-                {status === 'error' && (
-                  <div className="p-3 bg-red-950/40 border border-red-700/60 text-red-400 text-xs font-mono">
-                    ⚠ {errorMsg}
-                  </div>
-                )}
-
                 {/* Submit button */}
                 <button
                   type="submit"
-                  disabled={status === 'submitting'}
                   onMouseEnter={playHover}
-                  className="w-full flex items-center justify-center space-x-2 py-3.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold tracking-wider cyber-chamfer shadow-[0_0_20px_rgba(255,45,85,0.4)] transition-all duration-200 disabled:opacity-60"
+                  className="w-full flex items-center justify-center space-x-2 py-3.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold tracking-wider cyber-chamfer shadow-[0_0_20px_rgba(255,45,85,0.4)] transition-all duration-200"
                 >
-                  {status === 'submitting' ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>SENDING...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      <span>SEND MESSAGE</span>
-                    </>
-                  )}
+                  <Send className="w-4 h-4" />
+                  <span>SEND MESSAGE</span>
                 </button>
               </form>
             )}
