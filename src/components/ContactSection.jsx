@@ -1,10 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Send, Mail, Copy, Check, Radio, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Mail, Copy, Check, Radio, ExternalLink, Loader2 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 import { ItchIoIcon } from './BrandIcons';
 import { personalData } from '../data/portfolioData';
 import { playHover, playClick, playConfirm, playChirp } from '../utils/audio';
 
+// ─── EmailJS Configuration ──────────────────────────────────────────
+// To set up: https://www.emailjs.com
+// 1. Create free account → connect Gmail (anikpal475@gmail.com)
+// 2. Create a template with variables: {{from_name}}, {{from_email}}, {{service}}, {{message}}
+// 3. Paste your keys below:
+const EMAILJS_SERVICE_ID  = 'service_portfolio';   // From EmailJS Dashboard → Email Services
+const EMAILJS_TEMPLATE_ID = 'template_contact';    // From EmailJS Dashboard → Email Templates
+const EMAILJS_PUBLIC_KEY   = 'YOUR_PUBLIC_KEY';     // From EmailJS Dashboard → Account → API Keys
+// ────────────────────────────────────────────────────────────────────
+
 export default function ContactSection({ prefilledService }) {
+  const formRef = useRef(null);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,7 +26,8 @@ export default function ContactSection({ prefilledService }) {
   });
 
   const [copied, setCopied] = useState(false);
-  const [status, setStatus] = useState('idle'); // idle | success
+  const [status, setStatus] = useState('idle'); // idle | submitting | success | error
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     if (prefilledService) {
@@ -33,31 +47,52 @@ export default function ContactSection({ prefilledService }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
 
     playChirp();
+    setStatus('submitting');
+    setErrorMsg('');
 
-    const subject = encodeURIComponent(`[Portfolio] ${formData.service} — from ${formData.name}`);
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\nService: ${formData.service}\n\nMessage:\n${formData.message}`
-    );
-    const mailtoLink = `mailto:${personalData.email}?subject=${subject}&body=${body}`;
-
-    // Open email client
-    window.location.href = mailtoLink;
-
-    // Show success after short delay
-    setTimeout(() => {
+    // Check if EmailJS is configured
+    if (EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+      // Fallback to mailto if EmailJS not set up yet
+      const subject = encodeURIComponent(`[Portfolio] ${formData.service} — from ${formData.name}`);
+      const body = encodeURIComponent(
+        `Name: ${formData.name}\nEmail: ${formData.email}\nService: ${formData.service}\n\nMessage:\n${formData.message}`
+      );
+      window.open(`mailto:${personalData.email}?subject=${subject}&body=${body}`, '_blank');
       playConfirm();
       setStatus('success');
-    }, 500);
+      return;
+    }
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          service: formData.service,
+          message: formData.message,
+          to_email: personalData.email,
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+      playConfirm();
+      setStatus('success');
+    } catch (err) {
+      setErrorMsg(err?.text || 'Failed to send. Please try emailing directly.');
+      setStatus('error');
+    }
   };
 
   const handleReset = () => {
     playClick();
     setStatus('idle');
+    setErrorMsg('');
     setFormData({
       name: '',
       email: '',
@@ -65,6 +100,8 @@ export default function ContactSection({ prefilledService }) {
       message: '',
     });
   };
+
+  const isConfigured = EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY';
 
   return (
     <section id="contact" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-surface-950">
@@ -83,11 +120,11 @@ export default function ContactSection({ prefilledService }) {
           </p>
         </div>
 
-        {/* 2-Column Terminal Layout */}
+        {/* 2-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* Contact Form (7 Cols) */}
           <div className="lg:col-span-7 bg-surface-900 border border-brand-primary/40 cyber-chamfer p-6 sm:p-8 space-y-6 shadow-cyber-card">
-            {/* Terminal Window Header */}
+            {/* Terminal Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4 font-mono text-xs">
               <div className="flex items-center space-x-2">
                 <span className="w-2.5 h-2.5 bg-brand-primary rounded-full animate-ping" />
@@ -96,7 +133,7 @@ export default function ContactSection({ prefilledService }) {
                 </span>
               </div>
               <span className="text-brand-cyan text-[10px] bg-brand-cyan/10 px-2 py-0.5 border border-brand-cyan/30">
-                REAL EMAIL DELIVERY
+                {isConfigured ? 'REAL EMAIL DELIVERY' : 'EMAIL VIA YOUR MAIL APP'}
               </span>
             </div>
 
@@ -108,34 +145,28 @@ export default function ContactSection({ prefilledService }) {
                 </div>
                 <div className="space-y-3">
                   <h3 className="font-display font-bold text-2xl text-white">
-                    EMAIL CLIENT OPENED!
+                    {isConfigured ? 'MESSAGE DELIVERED!' : 'EMAIL CLIENT OPENED!'}
                   </h3>
                   <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-                    Your message is pre-filled and ready to send.<br />
-                    <span className="text-brand-primary font-bold">Please click "Send" in your email app</span> to deliver it to <span className="text-white">anikpal475@gmail.com</span>.
-                  </p>
-                  <p className="text-[10px] text-slate-500 max-w-sm mx-auto">
-                    No email app? Copy the address and email directly from Gmail.
+                    {isConfigured ? (
+                      <>Your message has been sent directly to <span className="text-brand-primary">anikpal475@gmail.com</span>. Expect a reply within 24 hours.</>
+                    ) : (
+                      <>Your message is pre-filled and ready to send. <span className="text-brand-primary font-bold">Please click "Send" in your email app</span> to deliver it to <span className="text-white">anikpal475@gmail.com</span>.</>
+                    )}
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+                <div className="pt-2">
                   <button
                     onClick={handleReset}
                     className="px-6 py-2.5 bg-surface-950 hover:bg-surface-850 text-brand-cyan border border-brand-cyan/40 hover:border-brand-cyan text-xs font-bold tracking-wider cyber-chamfer transition-all"
                   >
                     SEND ANOTHER MESSAGE
                   </button>
-                  <a
-                    href={`mailto:${personalData.email}`}
-                    className="px-6 py-2.5 bg-brand-primary/10 hover:bg-brand-primary text-brand-primary hover:text-white border border-brand-primary/40 hover:border-brand-primary text-xs font-bold tracking-wider cyber-chamfer transition-all text-center"
-                  >
-                    OPEN GMAIL DIRECTLY
-                  </a>
                 </div>
               </div>
             ) : (
-              /* Form State */
-              <form onSubmit={handleSubmit} className="space-y-5 font-mono text-xs">
+              /* Form */
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 font-mono text-xs">
                 {/* Name */}
                 <div className="space-y-1.5">
                   <label className="text-slate-400 block tracking-wider uppercase">
@@ -205,33 +236,48 @@ export default function ContactSection({ prefilledService }) {
                   />
                 </div>
 
-                {/* Submit button */}
+                {/* Error Message */}
+                {status === 'error' && (
+                  <div className="p-3 bg-red-950/40 border border-red-700/60 text-red-400 text-xs font-mono">
+                    ⚠ {errorMsg}
+                  </div>
+                )}
+
+                {/* Submit */}
                 <button
                   type="submit"
+                  disabled={status === 'submitting'}
                   onMouseEnter={playHover}
-                  className="w-full flex items-center justify-center space-x-2 py-3.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold tracking-wider cyber-chamfer shadow-[0_0_20px_rgba(255,45,85,0.4)] transition-all duration-200"
+                  className="w-full flex items-center justify-center space-x-2 py-3.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold tracking-wider cyber-chamfer shadow-[0_0_20px_rgba(255,45,85,0.4)] transition-all duration-200 disabled:opacity-60"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>SEND MESSAGE</span>
+                  {status === 'submitting' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>SENDING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>SEND MESSAGE</span>
+                    </>
+                  )}
                 </button>
               </form>
             )}
           </div>
 
-          {/* Right: Direct Contacts & Links (5 Cols) */}
+          {/* Right Column: Contact Info (5 Cols) */}
           <div className="lg:col-span-5 space-y-6 font-mono text-xs">
-            {/* Email Card with 1-Click Copy */}
+            {/* Email Card */}
             <div className="p-6 bg-surface-900 border border-slate-800 cyber-chamfer space-y-4">
               <span className="text-slate-400 tracking-wider uppercase block font-semibold">
                 // DIRECT EMAIL
               </span>
-
               <div className="p-3 bg-surface-950 border border-slate-800 flex items-center justify-between">
                 <div className="flex items-center space-x-2 truncate">
                   <Mail className="w-4 h-4 text-brand-primary flex-shrink-0" />
                   <span className="text-white font-bold truncate">{personalData.email}</span>
                 </div>
-
                 <button
                   onClick={handleCopyEmail}
                   onMouseEnter={playHover}
@@ -241,7 +287,6 @@ export default function ContactSection({ prefilledService }) {
                   {copied ? <Check className="w-4 h-4 text-brand-cyan" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
-
               {copied && (
                 <p className="text-[10px] text-brand-cyan tracking-wider">
                   ✔ EMAIL COPIED TO CLIPBOARD
@@ -249,12 +294,11 @@ export default function ContactSection({ prefilledService }) {
               )}
             </div>
 
-            {/* Geographical Coordinates */}
+            {/* Location */}
             <div className="p-6 bg-surface-900 border border-slate-800 cyber-chamfer space-y-4">
               <span className="text-slate-400 tracking-wider uppercase block font-semibold">
                 // LOCATION
               </span>
-
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-slate-300">
                   <span className="text-slate-500">BASE LOCATION:</span>
@@ -276,55 +320,27 @@ export default function ContactSection({ prefilledService }) {
               <span className="text-slate-400 tracking-wider uppercase block font-semibold">
                 // FIND ME ONLINE
               </span>
-
               <div className="grid grid-cols-2 gap-2">
-                <a
-                  href={personalData.itchio}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={playClick}
-                  onMouseEnter={playHover}
-                  className="p-3 bg-red-950/40 border border-red-800/80 hover:border-red-500 text-white flex items-center justify-between transition-all"
-                >
+                <a href={personalData.itchio} target="_blank" rel="noopener noreferrer" onClick={playClick} onMouseEnter={playHover}
+                  className="p-3 bg-red-950/40 border border-red-800/80 hover:border-red-500 text-white flex items-center justify-between transition-all">
                   <div className="flex items-center space-x-1.5">
                     <ItchIoIcon className="w-3.5 h-3.5 text-red-400" />
                     <span>ITCH.IO</span>
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-red-400" />
                 </a>
-
-                <a
-                  href={personalData.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={playClick}
-                  onMouseEnter={playHover}
-                  className="p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all"
-                >
+                <a href={personalData.github} target="_blank" rel="noopener noreferrer" onClick={playClick} onMouseEnter={playHover}
+                  className="p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all">
                   <span>GITHUB</span>
                   <ExternalLink className="w-3.5 h-3.5 text-brand-primary" />
                 </a>
-
-                <a
-                  href={personalData.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={playClick}
-                  onMouseEnter={playHover}
-                  className="p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all"
-                >
+                <a href={personalData.linkedin} target="_blank" rel="noopener noreferrer" onClick={playClick} onMouseEnter={playHover}
+                  className="p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all">
                   <span>LINKEDIN</span>
                   <ExternalLink className="w-3.5 h-3.5 text-brand-primary" />
                 </a>
-
-                <a
-                  href={personalData.resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={playClick}
-                  onMouseEnter={playHover}
-                  className="p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all"
-                >
+                <a href={personalData.resumeUrl} target="_blank" rel="noopener noreferrer" onClick={playClick} onMouseEnter={playHover}
+                  className="p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all">
                   <span>RESUME (CV)</span>
                   <ExternalLink className="w-3.5 h-3.5 text-brand-primary" />
                 </a>
