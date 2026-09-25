@@ -102,25 +102,35 @@ export default function ContactSection({ prefilledService }) {
 
             {status === 'success' ? (
               /* Success State */
-              <div className="py-12 text-center space-y-5 font-mono">
+              <div className="py-10 text-center space-y-5 font-mono">
                 <div className="w-16 h-16 mx-auto rounded-full bg-brand-primary/20 border-2 border-brand-primary flex items-center justify-center shadow-[0_0_25px_#ff2d55]">
                   <Check className="w-8 h-8 text-brand-primary" />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <h3 className="font-display font-bold text-2xl text-white">
-                    MESSAGE SENT!
+                    EMAIL CLIENT OPENED!
                   </h3>
-                  <p className="text-xs text-slate-400 max-w-md mx-auto">
-                    Your message was delivered directly to <span className="text-brand-primary">anikpal475@gmail.com</span>. Expect a reply within 24 hours.
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                    Your message is pre-filled and ready to send.<br />
+                    <span className="text-brand-primary font-bold">Please click "Send" in your email app</span> to deliver it to <span className="text-white">anikpal475@gmail.com</span>.
+                  </p>
+                  <p className="text-[10px] text-slate-500 max-w-sm mx-auto">
+                    No email app? Copy the address and email directly from Gmail.
                   </p>
                 </div>
-                <div className="pt-4">
+                <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
                   <button
                     onClick={handleReset}
                     className="px-6 py-2.5 bg-surface-950 hover:bg-surface-850 text-brand-cyan border border-brand-cyan/40 hover:border-brand-cyan text-xs font-bold tracking-wider cyber-chamfer transition-all"
                   >
                     SEND ANOTHER MESSAGE
                   </button>
+                  <a
+                    href={`mailto:${personalData.email}`}
+                    className="px-6 py-2.5 bg-brand-primary/10 hover:bg-brand-primary text-brand-primary hover:text-white border border-brand-primary/40 hover:border-brand-primary text-xs font-bold tracking-wider cyber-chamfer transition-all text-center"
+                  >
+                    OPEN GMAIL DIRECTLY
+                  </a>
                 </div>
               </div>
             ) : (
