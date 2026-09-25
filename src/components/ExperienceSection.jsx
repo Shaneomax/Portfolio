@@ -1,5 +1,5 @@
 import React from 'react';
-import { Briefcase, GraduationCap, BookOpen, ExternalLink, Calendar, MapPin, CheckCircle2 } from 'lucide-react';
+import { Briefcase, GraduationCap, Gamepad2, ExternalLink, Calendar, MapPin, CheckCircle2 } from 'lucide-react';
 import { GithubIcon } from './BrandIcons';
 import { experienceData, personalData } from '../data/portfolioData';
 import { playHover, playClick } from '../utils/audio';
@@ -39,10 +39,18 @@ export default function ExperienceSection() {
                   {/* Role Header */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
                     <div>
-                      <h3 className="font-display font-bold text-xl text-white group-hover:text-brand-primary transition-colors">
-                        {exp.role}
-                      </h3>
-                      <p className="font-mono text-sm text-brand-cyan font-semibold">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-display font-bold text-xl text-white group-hover:text-brand-primary transition-colors">
+                          {exp.role}
+                        </h3>
+                        {exp.period && (
+                          <span className="inline-flex items-center space-x-1 font-mono text-xs text-brand-primary bg-brand-primary/10 border border-brand-primary/30 px-2.5 py-0.5 cyber-chamfer font-semibold">
+                            <Calendar className="w-3 h-3 text-brand-primary mr-1" />
+                            <span>{exp.period}</span>
+                          </span>
+                        )}
+                      </div>
+                      <p className="font-mono text-sm text-brand-cyan font-semibold mt-0.5">
                         {exp.company}
                       </p>
                     </div>
@@ -80,7 +88,7 @@ export default function ExperienceSection() {
             ))}
           </div>
 
-          {/* Sidebar: Academia & Publications (4 Cols) */}
+          {/* Sidebar: Academia & Shipped Releases (4 Cols) */}
           <div className="lg:col-span-4 space-y-6">
             {/* Education Card */}
             <div className="p-6 bg-surface-950 border border-slate-800 hover:border-brand-cyan/60 cyber-chamfer transition-all duration-300 space-y-4">
@@ -111,35 +119,35 @@ export default function ExperienceSection() {
               </div>
             </div>
 
-            {/* Technical Publication Card */}
+            {/* Shipped Titles & Itch.io Card */}
             <div className="p-6 bg-surface-950 border border-slate-800 hover:border-brand-primary/60 cyber-chamfer transition-all duration-300 space-y-4">
               <div className="flex items-center space-x-2 font-mono text-xs text-brand-primary tracking-wider uppercase font-bold">
-                <BookOpen className="w-4 h-4 text-brand-primary" />
-                <span>TECHNICAL PUBLICATION</span>
+                <Gamepad2 className="w-4 h-4 text-brand-primary" />
+                <span>SHIPPED TITLES // ITCH.IO</span>
               </div>
 
               <div>
                 <h3 className="font-display font-bold text-base text-white">
-                  Building Messaging Platform in Unity
+                  8+ Playable Unity Releases
                 </h3>
                 <p className="font-mono text-xs text-slate-400 mt-0.5">
-                  Published via Brain Station 23 / Medium
+                  Playable on Itch.io & Windows Standalone
                 </p>
               </div>
 
               <p className="text-xs text-slate-300 font-sans leading-relaxed">
-                In-depth technical architecture breakdown detailing socket connection persistence, UI virtualization, and low-latency packet synchronization inside the Unity engine.
+                Hands-on gameplay projects spanning 3D survival horror, Tekken-style combat mechanics, 2D physics puzzles, and realistic golf simulations built in Unity and C#.
               </p>
 
               <a
-                href={personalData.medium}
+                href={personalData.itchio}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={playClick}
                 onMouseEnter={playHover}
                 className="inline-flex items-center space-x-2 font-mono text-xs text-brand-primary hover:text-white bg-brand-primary/10 hover:bg-brand-primary px-3.5 py-2 border border-brand-primary/30 cyber-chamfer transition-all"
               >
-                <span>READ PUBLICATION</span>
+                <span>EXPLORE ON ITCH.IO</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>

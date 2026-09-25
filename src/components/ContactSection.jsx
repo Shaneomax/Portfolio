@@ -319,24 +319,12 @@ export default function ContactSection({ prefilledService }) {
                 </a>
 
                 <a
-                  href={personalData.medium}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={playClick}
-                  onMouseEnter={playHover}
-                  className="p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all"
-                >
-                  <span>MEDIUM</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-brand-primary" />
-                </a>
-
-                <a
                   href={personalData.resumeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={playClick}
                   onMouseEnter={playHover}
-                  className="col-span-2 p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all"
+                  className="p-3 bg-surface-950 border border-slate-800 hover:border-brand-primary text-slate-300 hover:text-white flex items-center justify-between transition-all"
                 >
                   <span>RESUME PDF (CV)</span>
                   <ExternalLink className="w-3.5 h-3.5 text-brand-primary" />

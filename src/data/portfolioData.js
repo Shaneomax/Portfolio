@@ -13,8 +13,7 @@ export const personalData = {
   secondaryEmail: "anikpal475@gmail.com",
   github: "https://github.com/Shaneomax",
   itchio: "https://anik-pal.itch.io/",
-  linkedin: "https://linkedin.com",
-  medium: "https://medium.com/brainstation23/my-experience-with-building-messenger-in-unity-8d70d9d40922",
+  linkedin: "https://www.linkedin.com/in/anik-pal-296158243/",
   resumeUrl: "https://drive.google.com/drive/folders/1Z05YPUmnB0-88iV3Eu6As7eSMR3tGIWJ?usp=sharing",
   bioHeadline: "Developing responsive 2D & 3D gameplay loops, combat mechanics, and optimized game experiences in Unity.",
   bioParagraph1: "As a Unity Game Developer with 1.5+ years of hands-on experience, I build engaging 2D and 3D games across PC, WebGL (Itch.io), and mobile. I focus on core gameplay programming, state machines, Mixamo animations, 2D sprite sheets, Mecanim blend trees, physics, and responsive controls.",
@@ -538,13 +537,13 @@ export const experienceData = [
     id: "exp-brainstation",
     role: "Game Development Trainee",
     company: "Brain Station 23",
-    period: "3 Years Training",
+    period: "3 Months Training",
     location: "Dhaka, Bangladesh",
     type: "Professional Training Program",
     highlights: [
-      "Completed 3 years of structured, in-depth training in Unity game engine, advanced C# gameplay architecture, and real-time graphics.",
-      "Authored an in-engine real-time messaging and synchronization system in Unity, publishing technical insights via Brain Station 23 on Medium.",
-      "Mastered core gameplay programming, physics simulation, Mecanim state machines, blend trees, and cross-platform optimization."
+      "Completed 3 months of structured, in-depth training in Unity game engine, C# gameplay architecture, and real-time graphics.",
+      "Engineered gameplay prototypes, state machines, Mecanim blend trees, and 3D interaction systems.",
+      "Mastered core gameplay programming, physics simulation, component-based architectures, and cross-platform builds."
     ]
   },
   {

@@ -126,7 +126,7 @@ PLAYABLE GAMES:
 COORDINATES: ${personalData.coordinates}
 ITCH.IO: ${personalData.itchio}
 GITHUB: ${personalData.github}
-MEDIUM: ${personalData.medium}`
+LINKEDIN: ${personalData.linkedin}`
         });
         break;
 
